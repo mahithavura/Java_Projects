@@ -1,0 +1,99 @@
+import java.io.*;
+import java.util.*;
+
+public class SearchEngine {
+
+    static ArrayList<String> lines = new ArrayList<>();
+    static HashMap<String, Integer> wordCount = new HashMap<>();
+
+    public static void loadFile(String fileName) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+                String[] words = line.toLowerCase().split("\\s+");
+                for (String word : words) {
+                    wordCount.put(word, wordCount.getOrDefault(word, 0) + 1);
+                }
+            }
+
+            br.close();
+            System.out.println("File loaded successfully!");
+
+        } catch (IOException e) {
+            System.out.println("Error reading file!");
+        }
+    }
+
+    public static void searchKeyword(String keyword) {
+        System.out.println("\n--- Search Results ---");
+        keyword = keyword.toLowerCase();
+
+        for (String line : lines) {
+            if (line.toLowerCase().contains(keyword)) {
+
+                String highlighted = line.replaceAll("(?i)" + keyword, "[" + keyword.toUpperCase() + "]");
+                System.out.println(highlighted);
+            }
+        }
+    }
+
+    public static void showWordFrequency(String word) {
+        word = word.toLowerCase();
+        int count = wordCount.getOrDefault(word, 0);
+        System.out.println("Frequency of '" + word + "' = " + count);
+    }
+
+    public static void displayAllFrequencies() {
+        System.out.println("\n--- Word Frequencies ---");
+        for (String word : wordCount.keySet()) {
+            System.out.println(word + " : " + wordCount.get(word));
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter file name: ");
+        String fileName = sc.nextLine();
+
+        loadFile(fileName);
+
+        int choice;
+        do {
+            System.out.println("\n--- Search Engine ---");
+            System.out.println("1. Search Keyword");
+            System.out.println("2. Word Frequency");
+            System.out.println("3. Display All Frequencies");
+            System.out.println("4. Exit");
+
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter keyword: ");
+                    String keyword = sc.nextLine();
+                    searchKeyword(keyword);
+                    break;
+                case 2:
+                    System.out.print("Enter word: ");
+                    String word = sc.nextLine();
+                    showWordFrequency(word);
+                    break;
+                case 3:
+                    displayAllFrequencies();
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 4);
+    }
+}
