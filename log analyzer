@@ -1,0 +1,100 @@
+import java.io.*;
+import java.util.*;
+
+public class LogAnalyzer {
+
+    static HashMap<String, Integer> logCount = new HashMap<>();
+    static ArrayList<String> logs = new ArrayList<>();
+    public static void readLogs(String fileName) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                logs.add(line);
+                if (line.contains("ERROR")) {
+                    logCount.put("ERROR", logCount.getOrDefault("ERROR", 0) + 1);
+                } else if (line.contains("WARNING")) {
+                    logCount.put("WARNING", logCount.getOrDefault("WARNING", 0) + 1);
+                } else if (line.contains("INFO")) {
+                    logCount.put("INFO", logCount.getOrDefault("INFO", 0) + 1);
+                }
+            }
+
+            br.close();
+            System.out.println("Logs loaded successfully!");
+
+        } catch (IOException e) {
+            System.out.println("Error reading file!");
+        }
+    }
+
+    public static void displaySummary() {
+        System.out.println("\n--- Log Summary ---");
+        for (String type : logCount.keySet()) {
+            System.out.println(type + " : " + logCount.get(type));
+        }
+    }
+
+    public static void filterLogs(String keyword) {
+        System.out.println("\n--- Filtered Logs (" + keyword + ") ---");
+        for (String log : logs) {
+            if (log.contains(keyword)) {
+                System.out.println(log);
+            }
+        }
+    }
+
+    public static void searchLogs(String search) {
+        System.out.println("\n--- Search Results (" + search + ") ---");
+        for (String log : logs) {
+            if (log.contains(search)) {
+                System.out.println(log);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter log file name: ");
+        String fileName = sc.nextLine();
+
+        readLogs(fileName);
+
+        int choice;
+        do {
+            System.out.println("\n--- Log Analyzer ---");
+            System.out.println("1. Display Summary");
+            System.out.println("2. Filter Logs by Keyword");
+            System.out.println("3. Search Logs (Date/Type)");
+            System.out.println("4. Exit");
+
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    displaySummary();
+                    break;
+                case 2:
+                    System.out.print("Enter keyword: ");
+                    String keyword = sc.nextLine();
+                    filterLogs(keyword);
+                    break;
+                case 3:
+                    System.out.print("Enter search (date/type): ");
+                    String search = sc.nextLine();
+                    searchLogs(search);
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+
+        } while (choice != 4);
+    }
+}
