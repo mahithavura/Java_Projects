@@ -1,0 +1,129 @@
+#include <stdio.h>
+#include <string.h>
+
+struct Ticket {
+    char name[50];
+    int source;
+    int destination;
+    int fare;
+};
+
+struct Ticket t;
+int booked = 0;
+
+char stations[][20] = {
+    "Station A",
+    "Station B",
+    "Station C",
+    "Station D",
+    "Station E"
+};
+
+void viewStations() {
+    printf("\n--- Metro Stations ---\n");
+    for(int i = 0; i < 5; i++) {
+        printf("%d. %s\n", i + 1, stations[i]);
+    }
+}
+
+int calculateFare(int src, int dest) {
+    int distance;
+
+    if(src > dest)
+        distance = src - dest;
+    else
+        distance = dest - src;
+
+    return distance * 10;  // simple fare
+}
+
+void bookTicket() {
+    viewStations();
+
+    printf("\nEnter your name: ");
+    scanf("%s", t.name);
+
+    printf("Enter source: ");
+    scanf("%d", &t.source);
+
+    printf("Enter destination: ");
+    scanf("%d", &t.destination);
+
+    if(t.source < 1 || t.source > 5 || t.destination < 1 || t.destination > 5) {
+        printf("Invalid stations!\n");
+        return;
+    }
+
+    t.fare = calculateFare(t.source, t.destination);
+    booked = 1;
+
+    printf("\nTicket booked successfully!\n");
+}
+
+void showTicket() {
+    if(!booked) {
+        printf("\nNo ticket booked!\n");
+        return;
+    }
+
+    printf("\n--- Ticket Details ---\n");
+    printf("Name: %s\n", t.name);
+    printf("From: %s\n", stations[t.source - 1]);
+    printf("To: %s\n", stations[t.destination - 1]);
+    printf("Fare: ₹%d\n", t.fare);
+}
+
+void calculateFareMenu() {
+    int src, dest, fare;
+
+    viewStations();
+
+    printf("\nEnter source: ");
+    scanf("%d", &src);
+
+    printf("Enter destination: ");
+    scanf("%d", &dest);
+
+    if(src < 1 || src > 5 || dest < 1 || dest > 5) {
+        printf("Invalid stations!\n");
+        return;
+    }
+
+    fare = calculateFare(src, dest);
+    printf("Calculated Fare: ₹%d\n", fare);
+}
+
+int main() {
+    int choice;
+
+    while(1) {
+        printf("\n===== Metro Booking System =====\n");
+        printf("1. View Stations\n");
+        printf("2. Book Ticket\n");
+        printf("3. Show Ticket\n");
+        printf("4. Calculate Fare\n");
+        printf("5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                viewStations();
+                break;
+            case 2:
+                bookTicket();
+                break;
+            case 3:
+                showTicket();
+                break;
+            case 4:
+                calculateFareMenu();   
+                break;
+            case 5:
+                printf("Thank you!\n");
+                return 0;
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+}
