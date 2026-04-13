@@ -1,0 +1,28 @@
+import java.util.*;
+public class NumberSeriesGame {
+    public static void main(String[] args) {
+        Scanner s = new Scanner(System.in);
+        String[] questions = {
+            "2, 4, 6, 8, ?",
+            "1, 4, 9, 16, ?",
+            "1, 1, 2, 3, 5, ?",
+            "2, 3, 5,  7, ?",
+            "1, 2, 4, 7, ?",
+            "1, 8, 27, 64, ?",
+            "1, 5, 14, 30, ?"
+        };
+        int[] answers = {10, 25, 8, 11, 11, 125, 55};
+        int score = 0;
+        for (int i = 0; i < questions.length; i++) {
+            System.out.print("Question " + (i + 1) + ": \n" + questions[i]+"\nYour answer: ");
+            int answer = s.nextInt();
+            if (answer == answers[i]) {
+                System.out.println("Correct!");
+                score++;
+            } else {
+                System.out.println("Wrong! The correct answer is " + answers[i]);
+            }
+        }
+        System.out.println("Your final score is: " + score);
+    }
+}
