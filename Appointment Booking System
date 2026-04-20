@@ -1,0 +1,167 @@
+import java.io.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+class Appointment {
+    int id;
+    String name;
+    LocalDate date;
+    LocalTime time;
+
+    public Appointment(int id, String name, LocalDate date, LocalTime time) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.time = time;
+    }
+
+    public void display() {
+        System.out.println("\nID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Date: " + date);
+        System.out.println("Time: " + time);
+    }
+}
+
+public class AppointmentSystem {
+
+    static ArrayList<Appointment> list = new ArrayList<>();
+    static int idCounter = 1;
+
+    public static boolean isAvailable(LocalDate date, LocalTime time) {
+        for (Appointment a : list) {
+            if (a.date.equals(date) && a.time.equals(time)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void bookAppointment(Scanner sc) {
+        try {
+            System.out.print("Enter name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter date (yyyy-mm-dd): ");
+            String d = sc.nextLine();
+            LocalDate date = LocalDate.parse(d);
+
+            System.out.print("Enter time (HH:mm): ");
+            String t = sc.nextLine();
+            LocalTime time = LocalTime.parse(t);
+
+            if (!isAvailable(date, time)) {
+                System.out.println("Time slot already booked!");
+                return;
+            }
+
+            Appointment a = new Appointment(idCounter++, name, date, time);
+            list.add(a);
+
+            System.out.println("Appointment booked successfully! ID: " + a.id);
+
+        } catch (Exception e) {
+            System.out.println("Invalid date/time format!");
+        }
+    }
+
+    public static void cancelAppointment(Scanner sc) {
+        System.out.print("Enter Appointment ID: ");
+        int id = sc.nextInt();
+
+        Iterator<Appointment> it = list.iterator();
+
+        while (it.hasNext()) {
+            Appointment a = it.next();
+            if (a.id == id) {
+                it.remove();
+                System.out.println("Appointment cancelled!");
+                return;
+            }
+        }
+        System.out.println("Appointment not found!");
+    }
+
+    public static void viewSchedule() {
+        if (list.isEmpty()) {
+            System.out.println("No appointments found!");
+            return;
+        }
+
+        for (Appointment a : list) {
+            a.display();
+        }
+    }
+
+    public static void checkAvailability(Scanner sc) {
+        try {
+            System.out.print("Enter date (yyyy-mm-dd): ");
+            LocalDate date = LocalDate.parse(sc.next());
+
+            System.out.print("Enter time (HH:mm): ");
+            LocalTime time = LocalTime.parse(sc.next());
+
+            if (isAvailable(date, time)) {
+                System.out.println("Slot is available!");
+            } else {
+                System.out.println("Slot is already booked!");
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid input!");
+        }
+    }
+
+    public static void saveToFile() {
+        try {
+            PrintWriter pw = new PrintWriter("appointments.txt");
+
+            for (Appointment a : list) {
+                pw.println(a.id + "," + a.name + "," + a.date + "," + a.time);
+            }
+
+            pw.close();
+            System.out.println("Data saved!");
+        } catch (Exception e) {
+            System.out.println("Error saving file!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Appointment Booking System ---");
+            System.out.println("1. Book Appointment");
+            System.out.println("2. Cancel Appointment");
+            System.out.println("3. Check Availability");
+            System.out.println("4. View Schedule");
+            System.out.println("5. Save & Exit");
+
+            System.out.print("Enter choice: ");
+            int ch = sc.nextInt();
+            sc.nextLine();
+
+            switch (ch) {
+                case 1:
+                    bookAppointment(sc);
+                    break;
+                case 2:
+                    cancelAppointment(sc);
+                    break;
+                case 3:
+                    checkAvailability(sc);
+                    break;
+                case 4:
+                    viewSchedule();
+                    break;
+                case 5:
+                    saveToFile();
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
