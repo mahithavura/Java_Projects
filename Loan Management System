@@ -1,0 +1,169 @@
+import java.io.*;
+import java.util.*;
+
+class Loan {
+    int id;
+    String name;
+    double amount;
+    double rate;
+    int time;
+    double emi;
+    String status;
+    double remainingAmount;
+
+    public Loan(int id, String name, double amount, double rate, int time) {
+        this.id = id;
+        this.name = name;
+        this.amount = amount;
+        this.rate = rate;
+        this.time = time;
+        this.emi = calculateEMI();
+        this.status = "Pending";
+        this.remainingAmount = amount;
+    }
+
+    public double calculateEMI() {
+        double r = rate / (12 * 100);
+        double emi = (amount * r * Math.pow(1 + r, time)) / (Math.pow(1 + r, time) - 1);
+        return emi;
+    }
+
+    public void display() {
+        System.out.println("\nLoan ID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Amount: " + amount);
+        System.out.println("Interest Rate: " + rate);
+        System.out.println("Time (months): " + time);
+        System.out.println("EMI: " + emi);
+        System.out.println("Status: " + status);
+        System.out.println("Remaining Amount: " + remainingAmount);
+    }
+}
+
+public class LoanManagementSystem {
+
+    static ArrayList<Loan> loans = new ArrayList<>();
+    static int loanCounter = 1;
+
+    public static void applyLoan(Scanner sc) {
+        System.out.print("Enter name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter loan amount: ");
+        double amount = sc.nextDouble();
+
+        System.out.print("Enter interest rate: ");
+        double rate = sc.nextDouble();
+
+        System.out.print("Enter time (months): ");
+        int time = sc.nextInt();
+
+        Loan loan = new Loan(loanCounter++, name, amount, rate, time);
+        loans.add(loan);
+
+        System.out.println("Loan applied successfully! (Pending Approval)");
+    }
+
+    public static void approveReject(Scanner sc) {
+        System.out.print("Enter Loan ID: ");
+        int id = sc.nextInt();
+
+        for (Loan l : loans) {
+            if (l.id == id) {
+                System.out.print("Approve or Reject (A/R): ");
+                char choice = sc.next().charAt(0);
+
+                if (choice == 'A' || choice == 'a') {
+                    l.status = "Approved";
+                } else {
+                    l.status = "Rejected";
+                }
+                System.out.println("Status updated!");
+                return;
+            }
+        }
+        System.out.println("Loan not found!");
+    }
+
+    public static void viewLoans() {
+        for (Loan l : loans) {
+            l.display();
+        }
+    }
+
+    public static void repayLoan(Scanner sc) {
+        System.out.print("Enter Loan ID: ");
+        int id = sc.nextInt();
+
+        for (Loan l : loans) {
+            if (l.id == id && l.status.equals("Approved")) {
+                System.out.print("Enter payment amount: ");
+                double pay = sc.nextDouble();
+
+                l.remainingAmount -= pay;
+
+                if (l.remainingAmount <= 0) {
+                    l.remainingAmount = 0;
+                    l.status = "Completed";
+                }
+
+                System.out.println("Payment successful!");
+                return;
+            }
+        }
+        System.out.println("Loan not found or not approved!");
+    }
+
+    public static void saveToFile() {
+        try {
+            PrintWriter pw = new PrintWriter("loans.txt");
+
+            for (Loan l : loans) {
+                pw.println(l.id + "," + l.name + "," + l.amount + "," +
+                        l.rate + "," + l.time + "," + l.status + "," + l.remainingAmount);
+            }
+
+            pw.close();
+        } catch (Exception e) {
+            System.out.println("Error saving file!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Loan Management System ---");
+            System.out.println("1. Apply Loan");
+            System.out.println("2. Approve/Reject Loan");
+            System.out.println("3. View Loans");
+            System.out.println("4. Repay Loan");
+            System.out.println("5. Exit");
+
+            System.out.print("Enter choice: ");
+            int ch = sc.nextInt();
+            sc.nextLine();
+
+            switch (ch) {
+                case 1:
+                    applyLoan(sc);
+                    break;
+                case 2:
+                    approveReject(sc);
+                    break;
+                case 3:
+                    viewLoans();
+                    break;
+                case 4:
+                    repayLoan(sc);
+                    break;
+                case 5:
+                    saveToFile();
+                    System.out.println("Data saved. Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
