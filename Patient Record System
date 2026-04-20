@@ -1,0 +1,178 @@
+import java.io.*;
+import java.util.*;
+
+class Patient {
+    int id;
+    String name;
+    int age;
+    String disease;
+    ArrayList<String> history;
+
+    public Patient(int id, String name, int age, String disease) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.disease = disease;
+        history = new ArrayList<>();
+        history.add("Patient added with disease: " + disease);
+    }
+
+    public void updateRecord(String newDisease) {
+        history.add("Updated from " + disease + " to " + newDisease);
+        this.disease = newDisease;
+    }
+
+    public void display() {
+        System.out.println("\nID: " + id);
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Disease: " + disease);
+    }
+
+    public void showHistory() {
+        System.out.println("\nMedical History:");
+        for (String h : history) {
+            System.out.println(h);
+        }
+    }
+}
+
+public class PatientRecordSystem {
+
+    static ArrayList<Patient> patients = new ArrayList<>();
+    static int idCounter = 1;
+
+    public static void addPatient(Scanner sc) {
+        System.out.print("Enter name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter age: ");
+        int age = sc.nextInt();
+
+        sc.nextLine();
+        System.out.print("Enter disease: ");
+        String disease = sc.nextLine();
+
+        Patient p = new Patient(idCounter++, name, age, disease);
+        patients.add(p);
+
+        System.out.println("Patient added successfully! ID: " + p.id);
+    }
+
+    public static Patient searchPatient(int id) {
+        for (Patient p : patients) {
+            if (p.id == id) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public static void updatePatient(Scanner sc) {
+        System.out.print("Enter Patient ID: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+
+        Patient p = searchPatient(id);
+
+        if (p != null) {
+            System.out.print("Enter new disease: ");
+            String newDisease = sc.nextLine();
+            p.updateRecord(newDisease);
+            System.out.println("Record updated!");
+        } else {
+            System.out.println("Patient not found!");
+        }
+    }
+    public static void deletePatient(Scanner sc) {
+        System.out.print("Enter Patient ID: ");
+        int id = sc.nextInt();
+
+        Iterator<Patient> it = patients.iterator();
+
+        while (it.hasNext()) {
+            Patient p = it.next();
+            if (p.id == id) {
+                it.remove();
+                System.out.println("Patient deleted!");
+                return;
+            }
+        }
+        System.out.println("Patient not found!");
+    }
+
+    public static void viewPatient(Scanner sc) {
+        System.out.print("Enter Patient ID: ");
+        int id = sc.nextInt();
+
+        Patient p = searchPatient(id);
+
+        if (p != null) {
+            p.display();
+            p.showHistory();
+        } else {
+            System.out.println("Patient not found!");
+        }
+    }
+
+    public static void saveToFile() {
+        try {
+            PrintWriter pw = new PrintWriter("patients.txt");
+
+            for (Patient p : patients) {
+                pw.println(p.id + "," + p.name + "," + p.age + "," + p.disease);
+            }
+
+            pw.close();
+            System.out.println("Data saved to file!");
+        } catch (Exception e) {
+            System.out.println("Error saving file!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Patient Record System ---");
+            System.out.println("1. Add Patient");
+            System.out.println("2. Search Patient");
+            System.out.println("3. Update Record");
+            System.out.println("4. Delete Patient");
+            System.out.println("5. View Patient Details");
+            System.out.println("6. Save & Exit");
+
+            System.out.print("Enter choice: ");
+            int ch = sc.nextInt();
+            sc.nextLine();
+
+            switch (ch) {
+                case 1:
+                    addPatient(sc);
+                    break;
+                case 2:
+                    System.out.print("Enter Patient ID: ");
+                    int id = sc.nextInt();
+                    Patient p = searchPatient(id);
+                    if (p != null) p.display();
+                    else System.out.println("Patient not found!");
+                    break;
+                case 3:
+                    updatePatient(sc);
+                    break;
+                case 4:
+                    deletePatient(sc);
+                    break;
+                case 5:
+                    viewPatient(sc);
+                    break;
+                case 6:
+                    saveToFile();
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
