@@ -1,0 +1,104 @@
+import java.io.*;
+import java.util.*;
+
+public class TextSearchEngine {
+
+    static ArrayList<String> lines = new ArrayList<>();
+
+    public static void loadFile(String filename) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+
+            br.close();
+            System.out.println("File loaded successfully!\n");
+
+        } catch (Exception e) {
+            System.out.println("Error loading file!");
+        }
+    }
+
+    public static void searchKeyword(String keyword) {
+        boolean found = false;
+
+        System.out.println("\nMatching lines:\n");
+
+        for (String line : lines) {
+            if (line.toLowerCase().contains(keyword.toLowerCase())) {
+                found = true;
+
+                String highlighted = line.replaceAll("(?i)" + keyword, "[" + keyword.toUpperCase() + "]");
+                System.out.println(highlighted);
+            }
+        }
+
+        if (!found) {
+            System.out.println("No matches found.");
+        }
+    }
+
+    public static void wordFrequency() {
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for (String line : lines) {
+            String words[] = line.toLowerCase().split("\\W+");
+
+            for (String word : words) {
+                if (!word.isEmpty()) {
+                    map.put(word, map.getOrDefault(word, 0) + 1);
+                }
+            }
+        }
+
+        System.out.println("\nWord Frequencies:\n");
+
+        for (String key : map.keySet()) {
+            System.out.println(key + " : " + map.get(key));
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Text Search Engine ---");
+            System.out.println("1. Load File");
+            System.out.println("2. Search Keyword");
+            System.out.println("3. Word Frequency");
+            System.out.println("4. Exit");
+
+            System.out.print("Enter choice: ");
+            int choice = sc.nextInt();
+            sc.nextLine(); 
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter file name: ");
+                    String file = sc.nextLine();
+                    loadFile(file);
+                    break;
+
+                case 2:
+                    System.out.print("Enter keyword: ");
+                    String keyword = sc.nextLine();
+                    searchKeyword(keyword);
+                    break;
+
+                case 3:
+                    wordFrequency();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting...");
+                    return;
+
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
