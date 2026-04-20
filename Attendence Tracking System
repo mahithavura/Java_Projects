@@ -1,0 +1,139 @@
+import java.io.*;
+import java.time.LocalDate;
+import java.util.*;
+
+public class AttendanceSystem {
+
+    static HashMap<String, ArrayList<LocalDate>> attendance = new HashMap<>();
+
+    public static void markAttendance(Scanner sc) {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        LocalDate today = LocalDate.now();
+
+        attendance.putIfAbsent(name, new ArrayList<>());
+
+        if (attendance.get(name).contains(today)) {
+            System.out.println("Attendance already marked for today!");
+        } else {
+            attendance.get(name).add(today);
+            System.out.println("Attendance marked for " + today);
+        }
+    }
+
+    public static void viewReport(Scanner sc) {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        ArrayList<LocalDate> list = attendance.get(name);
+
+        if (list != null) {
+            System.out.println("\nAttendance Dates:");
+            for (LocalDate d : list) {
+                System.out.println(d);
+            }
+        } else {
+            System.out.println("Student not found!");
+        }
+    }
+
+    public static void calculatePercentage(Scanner sc) {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        System.out.print("Enter total working days: ");
+        int total = sc.nextInt();
+
+        ArrayList<LocalDate> list = attendance.get(name);
+
+        if (list != null) {
+            int present = list.size();
+            double percent = (present * 100.0) / total;
+
+            System.out.println("Attendance %: " + percent);
+        } else {
+            System.out.println("Student not found!");
+        }
+    }
+
+    public static void monthlySummary(Scanner sc) {
+        System.out.print("Enter student name: ");
+        String name = sc.nextLine();
+
+        ArrayList<LocalDate> list = attendance.get(name);
+
+        if (list != null) {
+            HashMap<Integer, Integer> monthMap = new HashMap<>();
+
+            for (LocalDate d : list) {
+                int month = d.getMonthValue();
+                monthMap.put(month, monthMap.getOrDefault(month, 0) + 1);
+            }
+
+            System.out.println("\nMonthly Attendance:");
+            for (int m : monthMap.keySet()) {
+                System.out.println("Month " + m + ": " + monthMap.get(m) + " days");
+            }
+        } else {
+            System.out.println("Student not found!");
+        }
+    }
+
+    public static void saveToFile() {
+        try {
+            PrintWriter pw = new PrintWriter("attendance.txt");
+
+            for (String name : attendance.keySet()) {
+                pw.print(name + ":");
+                for (LocalDate d : attendance.get(name)) {
+                    pw.print(d + ",");
+                }
+                pw.println();
+            }
+
+            pw.close();
+            System.out.println("Data saved!");
+        } catch (Exception e) {
+            System.out.println("Error saving file!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n--- Attendance Tracking System ---");
+            System.out.println("1. Mark Attendance");
+            System.out.println("2. View Attendance Report");
+            System.out.println("3. Calculate Percentage");
+            System.out.println("4. Monthly Summary");
+            System.out.println("5. Save & Exit");
+
+            System.out.print("Enter choice: ");
+            int ch = sc.nextInt();
+            sc.nextLine();
+
+            switch (ch) {
+                case 1:
+                    markAttendance(sc);
+                    break;
+                case 2:
+                    viewReport(sc);
+                    break;
+                case 3:
+                    calculatePercentage(sc);
+                    break;
+                case 4:
+                    monthlySummary(sc);
+                    break;
+                case 5:
+                    saveToFile();
+                    System.out.println("Exiting...");
+                    return;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
